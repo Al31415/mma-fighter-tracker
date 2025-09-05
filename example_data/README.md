@@ -2,18 +2,27 @@
 
 This directory contains sample video clips for testing the various tracking algorithms.
 
-## Test Clip: Adesanya vs. Du Plessis
+## Test Clips Available
 
+### 1. Adesanya vs. Du Plessis Fight Clip
 **File:** `adesanya_ddp_30s.mp4`
 **Source:** UFC 305 - Israel Adesanya vs. Dricus Du Plessis
-**Duration:** 30 seconds (0:00-0:30 of the fight)
-**Resolution:** 720p
-**Content:** Opening moments of the fight, good for testing basic tracking
+**Duration:** ~30 seconds
+**Size:** ~58 MB
+**Content:** Standing fight sequences, good for testing basic tracking and semantic analysis
 
-### Quick Test Commands
+### 2. Clinch Fighting Example  
+**File:** `clinch_example.mp4`
+**Source:** MMA clinch work compilation
+**Duration:** ~60 seconds  
+**Size:** ~130 MB
+**Content:** Close-range clinch work, perfect for testing occlusion-aware trackers
 
+## Quick Test Commands
+
+### For Standing Fight (adesanya_ddp_30s.mp4)
 ```bash
-# Test the main semantic tracker
+# Test the main semantic tracker (best accuracy)
 python fighter_tracker.py --video example_data/adesanya_ddp_30s.mp4 --outdir test_results/semantic --max-frames 150
 
 # Test BotSORT (fastest)
@@ -21,6 +30,18 @@ python bmp_botsort_tracker.py --video example_data/adesanya_ddp_30s.mp4 --outdir
 
 # Test with keypoints visualization
 python fighter_tracker.py --video example_data/adesanya_ddp_30s.mp4 --outdir test_results/keypoints --max-frames 150 --draw-keypoints
+```
+
+### For Clinch Work (clinch_example.mp4)
+```bash
+# Test occlusion-aware tracker (best for close combat)
+python bmp_occlusion_tracker.py --video example_data/clinch_example.mp4 --outdir test_results/occlusion --max-frames 200
+
+# Test occlusion-aware BotSORT
+python bmp_occlusion_botsort.py --video example_data/clinch_example.mp4 --outdir test_results/occlusion_botsort --max-frames 200
+
+# Test iterative refinement (SAM-based)
+python bmp_iterative_refine_tracker.py --video example_data/clinch_example.mp4 --outdir test_results/iterative --max-frames 200
 ```
 
 ### Expected Results

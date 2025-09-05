@@ -1,47 +1,69 @@
 # Example Data for MMA Fighter Tracker
 
-This directory contains sample video clips for testing the various tracking algorithms.
+This directory provides instructions and examples for testing the various tracking algorithms.
 
-## Test Clips Available
+## Getting Test Data
 
-### 1. Adesanya vs. Du Plessis Fight Clip
-**File:** `adesanya_ddp_30s.mp4`
-**Source:** UFC 305 - Israel Adesanya vs. Dricus Du Plessis
-**Duration:** ~30 seconds
-**Size:** ~58 MB
-**Content:** Standing fight sequences, good for testing basic tracking and semantic analysis
+Due to GitHub's file size limits, video files are not included in the repository. Here are several ways to get test data:
 
-### 2. Clinch Fighting Example  
-**File:** `clinch_example.mp4`
-**Source:** MMA clinch work compilation
-**Duration:** ~60 seconds  
-**Size:** ~130 MB
-**Content:** Close-range clinch work, perfect for testing occlusion-aware trackers
+### Option 1: Use Your Own Videos
+Place any MP4 video file in this directory and run the trackers:
+```bash
+# Add your video file
+cp your_fight_video.mp4 example_data/
+
+# Test with any tracker
+python fighter_tracker.py --video example_data/your_fight_video.mp4 --outdir test_results
+```
+
+### Option 2: Download Sample Clips
+Create small test clips from any MMA video source:
+- **Recommended size**: 10-60 seconds for quick testing
+- **Resolution**: 720p or higher for best results
+- **Format**: MP4, AVI, MOV supported
+
+### Option 3: Use YouTube Downloader
+Use the included YouTube downloader to get UFC free fights:
+```bash
+python youtube_free_fights.py --query "ufc free fight" --max-results 5 --outdir example_data
+```
 
 ## Quick Test Commands
 
-### For Standing Fight (adesanya_ddp_30s.mp4)
+Once you have a video file in this directory, use these commands to test different algorithms:
+
+### For Standing Fights (open fighting)
 ```bash
 # Test the main semantic tracker (best accuracy)
-python fighter_tracker.py --video example_data/adesanya_ddp_30s.mp4 --outdir test_results/semantic --max-frames 150
+python fighter_tracker.py --video example_data/your_video.mp4 --outdir test_results/semantic --max-frames 150
 
 # Test BotSORT (fastest)
-python bmp_botsort_tracker.py --video example_data/adesanya_ddp_30s.mp4 --outdir test_results/botsort --max-frames 150
+python bmp_botsort_tracker.py --video example_data/your_video.mp4 --outdir test_results/botsort --max-frames 150
 
 # Test with keypoints visualization
-python fighter_tracker.py --video example_data/adesanya_ddp_30s.mp4 --outdir test_results/keypoints --max-frames 150 --draw-keypoints
+python fighter_tracker.py --video example_data/your_video.mp4 --outdir test_results/keypoints --max-frames 150 --draw-keypoints
 ```
 
-### For Clinch Work (clinch_example.mp4)
+### For Close Combat (clinch work, grappling)
 ```bash
 # Test occlusion-aware tracker (best for close combat)
-python bmp_occlusion_tracker.py --video example_data/clinch_example.mp4 --outdir test_results/occlusion --max-frames 200
+python bmp_occlusion_tracker.py --video example_data/your_video.mp4 --outdir test_results/occlusion --max-frames 200
 
 # Test occlusion-aware BotSORT
-python bmp_occlusion_botsort.py --video example_data/clinch_example.mp4 --outdir test_results/occlusion_botsort --max-frames 200
+python bmp_occlusion_botsort.py --video example_data/your_video.mp4 --outdir test_results/occlusion_botsort --max-frames 200
 
 # Test iterative refinement (SAM-based)
-python bmp_iterative_refine_tracker.py --video example_data/clinch_example.mp4 --outdir test_results/iterative --max-frames 200
+python bmp_iterative_refine_tracker.py --video example_data/your_video.mp4 --outdir test_results/iterative --max-frames 200
+```
+
+### Quick Download and Test
+```bash
+# Download a UFC free fight clip
+python youtube_free_fights.py --query "ufc free fight adesanya" --max-results 1 --outdir example_data
+
+# Find the downloaded file and test it
+ls example_data/*.mp4
+python fighter_tracker.py --video example_data/UFC_*.mp4 --outdir test_results --max-frames 100
 ```
 
 ### Expected Results

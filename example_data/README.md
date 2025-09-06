@@ -1,10 +1,19 @@
 # Example Data for MMA Fighter Tracker
 
-This directory provides instructions and examples for testing the various tracking algorithms.
+This directory contains sample video clips and instructions for testing the various tracking algorithms.
 
-## Getting Test Data
+## Available Test Data
 
-Due to GitHub's file size limits, video files are not included in the repository. Here are several ways to get test data:
+### Adesanya vs. Du Plessis Fight Clip
+**File:** `UFC_20250803_Dricus_Du_Plessis_vs_Israel_Adesanya_FULL_FIGHT_UFC_319.f616 - chunk_17 [510-540]s.mp4`
+**Source:** UFC 305 - Israel Adesanya vs. Dricus Du Plessis  
+**Duration:** 30 seconds (8:30-9:00 of the fight)
+**Size:** 72 MB (compressed)
+**Content:** Mid-fight action with striking exchanges, perfect for testing all tracking algorithms
+
+## Getting Additional Test Data
+
+You can also add your own videos or download more clips:
 
 ### Option 1: Use Your Own Videos
 Place any MP4 video file in this directory and run the trackers:
@@ -32,16 +41,22 @@ python youtube_free_fights.py --query "ufc free fight" --max-results 5 --outdir 
 
 Once you have a video file in this directory, use these commands to test different algorithms:
 
-### For Standing Fights (open fighting)
+### Test the Adesanya vs Du Plessis Clip
 ```bash
 # Test the main semantic tracker (best accuracy)
-python fighter_tracker.py --video example_data/your_video.mp4 --outdir test_results/semantic --max-frames 150
+python fighter_tracker.py --video "example_data/UFC_20250803_Dricus_Du_Plessis_vs_Israel_Adesanya_FULL_FIGHT_UFC_319.f616 - chunk_17 [510-540]s.mp4" --outdir test_results/semantic --max-frames 150
 
 # Test BotSORT (fastest)
-python bmp_botsort_tracker.py --video example_data/your_video.mp4 --outdir test_results/botsort --max-frames 150
+python bmp_botsort_tracker.py --video "example_data/UFC_20250803_Dricus_Du_Plessis_vs_Israel_Adesanya_FULL_FIGHT_UFC_319.f616 - chunk_17 [510-540]s.mp4" --outdir test_results/botsort --max-frames 150
 
 # Test with keypoints visualization
-python fighter_tracker.py --video example_data/your_video.mp4 --outdir test_results/keypoints --max-frames 150 --draw-keypoints
+python fighter_tracker.py --video "example_data/UFC_20250803_Dricus_Du_Plessis_vs_Israel_Adesanya_FULL_FIGHT_UFC_319.f616 - chunk_17 [510-540]s.mp4" --outdir test_results/keypoints --max-frames 150 --draw-keypoints
+```
+
+### For Your Own Videos
+```bash
+# Test any video you add to this directory
+python fighter_tracker.py --video example_data/your_video.mp4 --outdir test_results/semantic --max-frames 150
 ```
 
 ### For Close Combat (clinch work, grappling)

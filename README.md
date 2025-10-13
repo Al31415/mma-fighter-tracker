@@ -2,7 +2,7 @@
 
 A sophisticated computer vision system for tracking and analyzing fighters in MMA/UFC videos using semantic segmentation, CLIP embeddings, and multi-object tracking. This repository provides multiple tracking algorithms optimized for combat sports analysis.
 
-## 🥊 Features
+## Features
 
 - **Person Segmentation**: Uses MaskR-CNN for accurate person detection and segmentation
 - **Semantic Embeddings**: Leverages CLIP for robust visual feature extraction
@@ -118,7 +118,7 @@ frame,track_id,x1,y1,x2,y2,age
 ...
 ```
 
-## 📁 Project Structure & Files
+## Project Structure & Files
 
 ### Core Tracking Scripts
 
@@ -178,7 +178,7 @@ The system uses a multi-stage pipeline:
 - **Adaptive Splitting**: Watershed algorithm separates merged fighter detections
 - **Robust Association**: Combines multiple cues for reliable tracking
 
-## 📊 Data Organization
+## Data Organization
 
 ### Recommended Directory Structure
 
@@ -217,7 +217,7 @@ python fighter_tracker.py --video data/ufc_events/ufc_300/your_fight_video.mp4 -
 python bmp_botsort_tracker.py --video data/ufc_events/ufc_300/your_fight_video.mp4 --outdir outputs/ufc_300_botsort
 ```
 
-## 🎯 Example Data & Testing
+## Example Data & Testing
 
 ### Adesanya vs. Du Plessis Test Clip
 
@@ -266,7 +266,7 @@ python video_cluster_embed.py \
 - `labels/`: Semantic segmentation masks
 - Interactive embedding visualizations
 
-## ⚡ Performance Notes
+## Performance Notes
 
 | Tracker | Speed (FPS) | GPU Memory | Accuracy | Best Use Case |
 |---------|-------------|------------|----------|---------------|
@@ -281,7 +281,7 @@ python video_cluster_embed.py \
 - Lower `--conf` threshold if missing detections
 - Use GPU acceleration for significant speedup
 
-## 📄 License
+## License
 
 This project is open source under the MIT License. Please check individual model licenses for commercial use:
 - MaskR-CNN, Keypoint R-CNN: Apache 2.0
@@ -289,7 +289,7 @@ This project is open source under the MIT License. Please check individual model
 - YOLO: GPL-3.0
 - BotSORT, DeepSORT: Various (check respective repositories)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Areas for improvement:
 - New tracking algorithms
@@ -300,7 +300,7 @@ Contributions welcome! Areas for improvement:
 
 Please feel free to submit pull requests or open issues for bugs and feature requests.
 
-## 📚 Citation
+## Citation
 
 If you use this code in your research, please cite:
 

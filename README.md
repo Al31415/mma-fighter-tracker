@@ -300,15 +300,4 @@ Contributions welcome! Areas for improvement:
 
 Please feel free to submit pull requests or open issues for bugs and feature requests.
 
-## Citation
 
-If you use this code in your research, please cite:
-
-```bibtex
-@software{mma_fighter_tracker,
-  title={MMA Fighter Tracker: Semantic Multi-Object Tracking for Combat Sports},
-  author={Al31415},
-  year={2024},
-  url={https://github.com/Al31415/mma-fighter-tracker}
-}
-``` 

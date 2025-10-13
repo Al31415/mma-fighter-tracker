@@ -13,7 +13,7 @@ A sophisticated computer vision system for tracking and analyzing fighters in MM
 - **Data Export**: Exports tracking data in CSV format and semantic label maps
 - **Multiple Algorithms**: BotSORT, DeepSORT, occlusion-aware tracking, and custom semantic tracking
 
-## 📋 Requirements
+## Requirements
 
 - Python 3.8+
 - PyTorch >= 1.13.0
@@ -23,7 +23,7 @@ A sophisticated computer vision system for tracking and analyzing fighters in MM
 - NumPy >= 1.21.0
 - Additional dependencies in `requirements.txt`
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 

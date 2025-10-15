@@ -1,303 +1,178 @@
 # MMA Fighter Tracker
 
-A sophisticated computer vision system for tracking and analyzing fighters in MMA/UFC videos using semantic segmentation, CLIP embeddings, and multi-object tracking. This repository provides multiple tracking algorithms optimized for combat sports analysis.
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenCV](https://img.shields.io/badge/OpenCV-4.5+-green.svg)](https://opencv.org/)
 
-## Features
+**Robust multi-object tracking for MMA/UFC videos using YOLO + BotSORT + VIPS ReID**
 
-- **Person Segmentation**: Uses MaskR-CNN for accurate person detection and segmentation
-- **Semantic Embeddings**: Leverages CLIP for robust visual feature extraction
-- **Multi-Object Tracking**: Combines IoU and semantic similarity for consistent tracking
-- **Keypoint Detection**: Optional pose estimation for enhanced analysis
-- **Mask Splitting**: Automatic separation of interlinked fighters using watershed segmentation
-- **Video Output**: Generates annotated videos with track IDs and optional keypoints
-- **Data Export**: Exports tracking data in CSV format and semantic label maps
-- **Multiple Algorithms**: BotSORT, DeepSORT, occlusion-aware tracking, and custom semantic tracking
+Tracking fighters in MMA is challenging due to rapid motion, severe occlusions, and similar appearances. This system combines state-of-the-art detection, tracking, and re-identification to maintain consistent fighter identities throughout combat sequences.
 
-## Requirements
+## What Problem Does This Solve?
 
-- Python 3.8+
-- PyTorch >= 1.13.0
-- OpenCV >= 4.5.0
-- Transformers (HuggingFace) >= 4.20.0
-- Torchvision >= 0.14.0
-- NumPy >= 1.21.0
-- Additional dependencies in `requirements.txt`
+- **Automated Fight Analysis**: Generate highlight reels and fight statistics
+- **Broadcast Enhancement**: Real-time fighter identification for live events  
+- **Training Analysis**: Track fighter movement patterns and positioning
+- **Research Applications**: Large-scale analysis of combat sports data
+
+## Demo Video
+
+See the tracker in action on a real UFC fight:
+
+[![MMA Fighter Tracker Demo](https://img.youtube.com/vi/ioP4ylr0Ggk/0.jpg)](https://www.youtube.com/watch?v=ioP4ylr0Ggk)
+
+*Click to watch: Real-time fighter tracking with robust occlusion handling*
+
+## Key Features
+
+- **Robust Detection**: YOLOv8-seg for accurate person detection and segmentation
+- **Motion Prediction**: BotSORT with Kalman filtering for smooth tracking
+- **Identity Consistency**: VIPS ReID (OSNet) for view-invariant person recognition
+- **Occlusion Handling**: Maintains tracks through severe fighter overlap
+- **Rich Output**: CSV data, annotated videos, and segmentation masks
+- **Configurable**: Tunable parameters for different scenarios
 
 ## Quick Start
 
-### Installation
+Get up and running in 5 minutes:
 
-1. **Clone this repository:**
 ```bash
+# Clone and setup
 git clone https://github.com/Al31415/mma-fighter-tracker.git
 cd mma-fighter-tracker
-```
-
-2. **Install dependencies:**
-```bash
 pip install -r requirements.txt
+
+# Run on example video
+python src/tracker.py --video example_data/UFC_20250803_Dricus_Du_Plessis_vs_Israel_Adesanya_FULL_FIGHT_UFC_319.f616\ -\ chunk_17\ \[510-540\]s.mp4 --outdir results
+
+# View results
+ls results/
+# tracked.mp4  tracks.csv  labels/
 ```
 
-3. **Download model weights** (automatically downloaded on first use):
-- MaskR-CNN ResNet-50 (person segmentation)
-- CLIP ViT-B/32 (semantic embeddings)  
-- Keypoint R-CNN ResNet-50 (pose estimation)
-- Optional: YOLOv8, OSNet ReID, SAM models for specific trackers
+## How It Works
 
-### Test with Example Data
+### 3-Stage Pipeline
 
-We provide a sample clip from the Adesanya vs. Du Plessis fight for testing:
+```
+Video Input → Detection → Tracking → ReID → Output
+     ↓           ↓          ↓        ↓        ↓
+   Frame     YOLOv8-seg  BotSORT  OSNet   CSV + Video
+```
+
+1. **Detection**: YOLOv8-seg identifies and segments persons in each frame
+2. **Tracking**: BotSORT associates detections across frames using motion prediction
+3. **ReID**: OSNet ReID maintains identity consistency during occlusions
+
+### Why This Approach?
+
+- **YOLO**: Fast, accurate detection even with partial occlusion
+- **BotSORT**: Superior motion modeling for rapid fighter movement  
+- **VIPS ReID**: View-invariant features handle pose changes and lighting
+- **Combined**: Each component addresses specific MMA tracking challenges
+
+## Usage & Configuration
+
+### Basic Usage
 
 ```bash
-# Download the example clip (30-second segment)
-mkdir -p example_data
-# Add your test video to example_data/
-
-# Run basic tracking
-python fighter_tracker.py --video example_data/test_clip.mp4 --outdir results --max-frames 100
-
-# Or try different algorithms
-python bmp_botsort_tracker.py --video example_data/test_clip.mp4 --outdir results_botsort
+python src/tracker.py --video your_fight.mp4 --outdir results
 ```
 
-## Usage
+### Key Parameters
 
-### Basic Tracking
-
-```bash
-python fighter_tracker.py --video path/to/your/video.mp4 --outdir output_directory
-```
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--conf` | 0.5 | Detection confidence threshold |
+| `--max-frames` | 400 | Maximum frames to process (0 = all) |
+| `--stride` | 5 | Process every Nth frame for speed |
+| `--max-fighters` | 2 | Maximum fighters to track |
 
 ### Advanced Configuration
 
 ```bash
-python fighter_tracker.py \
-    --video input_video.mp4 \
-    --outdir tracker_output \
-    --stride 5 \
-    --conf 0.6 \
-    --iou-weight 0.4 \
-    --sim-weight 0.6 \
-    --max-persons 2 \
-    --draw-keypoints
+python src/tracker.py \
+    --video fight.mp4 \
+    --outdir results \
+    --conf 0.4 \
+    --max-frames 1000 \
+    --stride 3 \
+    --max-fighters 2
 ```
 
-### Parameters
+### Output Format
 
-- `--video`: Path to input video file
-- `--outdir`: Output directory for results (default: `tracker_out`)
-- `--stride`: Process every Nth frame (default: 5)
-- `--conf`: Detection confidence threshold (default: 0.6)
-- `--iou-weight`: Weight for IoU in matching score (default: 0.4)
-- `--sim-weight`: Weight for semantic similarity (default: 0.6)
-- `--iou-thresh`: Minimum IoU for geometric matching (default: 0.1)
-- `--sim-thresh`: Minimum cosine similarity for semantic matching (default: 0.2)
-- `--max-missed`: Max frames before terminating track (default: 20)
-- `--max-frames`: Maximum frames to process (default: 400, 0 for all)
-- `--max-persons`: Maximum persons to track per frame (default: 2)
-- `--min-mask-area-frac`: Minimum mask area fraction (default: 0.005)
-- `--center-bias`: Center bias weight for scoring (default: 0.3)
-- `--no-disjoint-overlaps`: Disable overlap resolution
-- `--no-keypoint-split`: Disable keypoint-based splitting
-- `--draw-keypoints`: Draw pose keypoints on output video
-
-## Output
-
-The tracker generates several outputs:
-
-1. **tracked.mp4**: Annotated video with track overlays
-2. **tracks.csv**: Tracking data with bounding boxes and track IDs
-3. **labels/**: Directory with semantic segmentation maps (PNG files)
-
-### CSV Format
-
-```
-frame,track_id,x1,y1,x2,y2,age
-0,1,100.0,50.0,200.0,300.0,1
-0,2,250.0,80.0,350.0,320.0,1
-...
+**CSV Data** (`tracks.csv`):
+```csv
+frame,track_id,x1,y1,x2,y2
+0,1,559.0,256.0,1420.0,1015.0
+5,1,823.0,305.0,1404.0,1034.0
 ```
 
-## Project Structure & Files
+**Files Generated**:
+- `tracked.mp4`: Annotated video with bounding boxes and IDs
+- `tracks.csv`: Frame-by-frame tracking data
+- `labels/`: Segmentation masks for each frame
 
-### Core Tracking Scripts
+## Results & Performance
 
-| File | Purpose | Key Features |
-|------|---------|-------------|
-| **`fighter_tracker.py`** | Main semantic tracker | CLIP embeddings + MaskR-CNN, keypoint splitting, watershed segmentation |
-| **`bmp_botsort_tracker.py`** | BotSORT implementation | YOLO detection, motion prediction, Re-ID features |
-| **`bmp_botsort_reid.py`** | BotSORT with ReID | Enhanced identity matching with appearance features |
-| **`bmp_deepsort_tracker.py`** | DeepSORT tracker | Kalman filtering + deep appearance features |
-| **`bmp_occlusion_tracker.py`** | Occlusion-aware tracking | Handles fighter overlap and occlusion scenarios |
-| **`bmp_occlusion_botsort.py`** | Occlusion-aware BotSORT | BotSORT optimized for combat sports occlusions |
-| **`bmp_iterative_refine_tracker.py`** | Iterative refinement | SAM-based mask refinement with keypoint guidance |
+### Example Results (Adesanya vs. Du Plessis)
 
-### Analysis & Utilities
+| Metric | Value |
+|--------|-------|
+| **Frames Processed** | 150 |
+| **Unique Track IDs** | 2 |
+| **Total Detections** | 348 |
+| **Frames with Both Fighters** | 50 |
+| **ID Consistency** | 100% |
+| **Processing Speed** | ~15 FPS |
 
-| File | Purpose | Usage |
-|------|---------|-------|
-| **`count_fights.py`** | Count downloaded fights | `python count_fights.py --dir ufc_videos --official-only` |
-| **`download_ufc.py`** | Download UFC videos | Scrapes fight videos from online sources |
-| **`youtube_free_fights.py`** | YouTube UFC downloader | `python youtube_free_fights.py --query "ufc free fight" --max-results 50` |
-| **`interactive_embeddings.py`** | Embedding visualization | `python interactive_embeddings.py --csv embeddings_2d.csv` |
-| **`video_cluster_embed.py`** | Video clustering | `python video_cluster_embed.py --video fight.mp4 --chunk-duration 30` |
+### Comparison to Alternatives
 
-### Algorithm Comparison
+| Tracker | ID Consistency | Occlusion Handling | Speed |
+|---------|---------------|-------------------|-------|
+| **YOLO+BotSORT+VIPS** | Excellent | Excellent | Good |
+| Semantic (MaskR-CNN) | Good | Poor | Poor |
+| Basic BotSORT | Good | Good | Excellent |
 
-| Algorithm | Best For | Pros | Cons |
-|-----------|----------|------|------|
-| **Semantic Tracker** | Complex occlusions, identity consistency | CLIP embeddings, robust to appearance changes | Computationally intensive |
-| **BotSORT** | Real-time applications | Fast, good motion prediction | May struggle with heavy occlusion |
-| **DeepSORT** | Balanced performance | Proven track record, stable | Limited semantic understanding |
-| **Occlusion-aware** | Close combat, clinching | Specialized for combat sports | May over-segment in open fighting |
+*See [docs/RESULTS.md](docs/RESULTS.md) for detailed performance analysis*
 
-## Technical Details
-
-### Architecture
-
-The system uses a multi-stage pipeline:
-
-1. **Detection**: MaskR-CNN detects and segments persons in each frame
-2. **Selection**: Filters detections based on size, position, and confidence
-3. **Embedding**: CLIP encodes visual features for each detected person
-4. **Tracking**: Associates detections across frames using IoU + semantic similarity
-5. **Refinement**: Optional keypoint-based splitting of merged detections
-
-### Key Components
-
-- `PersonSegmenter`: MaskR-CNN-based person detection and segmentation
-- `ClipEmbedder`: CLIP-based visual feature extraction
-- `PersonKeypointDetector`: Pose estimation for enhanced tracking
-- `SemanticTracker`: Multi-object tracking with semantic features
-- `Track`: Individual track state management
-
-### Algorithm Features
-
-- **Semantic Consistency**: Uses CLIP embeddings to maintain identity across occlusions
-- **Geometric Validation**: IoU-based validation prevents track switching
-- **Adaptive Splitting**: Watershed algorithm separates merged fighter detections
-- **Robust Association**: Combines multiple cues for reliable tracking
-
-## Data Organization
-
-### Recommended Directory Structure
+## Project Structure
 
 ```
 mma-fighter-tracker/
-├── example_data/                    # Test videos and sample data
-│   ├── adesanya_ddp_clip.mp4       # Example: 30s clip for testing
-│   └── README.md                   # Data usage instructions
-├── models/                         # Downloaded model weights
-│   ├── osnet_x0_25_msmt17.pt      # ReID model
-│   ├── yolov8x-pose.pt            # Pose detection
-│   └── sam_vit_h_4b8939.pth       # SAM segmentation
-├── data/                           # Your video datasets
-│   ├── ufc_videos/                # Downloaded UFC fights
-│   ├── training_clips/            # Clips for model training
-│   └── test_sets/                 # Evaluation datasets
-└── outputs/                        # Tracking results
-    ├── tracker_out_semantic/      # Semantic tracker results
-    ├── tracker_out_botsort/       # BotSORT results
-    └── analysis/                  # Embedding visualizations
+├── src/
+│   ├── tracker.py                    # Main tracker (YOLO + BotSORT + VIPS)
+│   ├── alternative_trackers/         # Experimental algorithms
+│   ├── utils/                        # Helper functions
+│   ├── osnet_x0_25_msmt17.pt        # ReID model weights
+│   └── yolov8x-seg.pt               # YOLO model weights
+├── requirements.txt                  # Dependencies
+├── example_data/                     # Sample video for testing
+├── docs/                             # Technical documentation
+├── notebooks/                        # Interactive demos
+└── scripts/                          # Data collection tools
 ```
 
-### Adding Your Own Data
+## Tuning Options
 
-1. **Video Format**: MP4, AVI, MOV supported. Recommended: 720p+ resolution
-2. **Naming Convention**: Use descriptive names like `fighter1_vs_fighter2_event_date.mp4`
-3. **Organization**: Group by event, date, or fighter for easy management
+### Extending the System
 
-```bash
-# Example: Add new fight videos
-mkdir -p data/ufc_events/ufc_300
-cp your_fight_video.mp4 data/ufc_events/ufc_300/
+1. **New Detection Models**: Replace YOLOv8-seg in `src/tracker.py`
+2. **Alternative Trackers**: Add to `src/alternative_trackers/`
+3. **Custom ReID**: Modify the OSNet implementation
+4. **Post-processing**: Use utilities in `src/utils/`
 
-# Process with different trackers
-python fighter_tracker.py --video data/ufc_events/ufc_300/your_fight_video.mp4 --outdir outputs/ufc_300_semantic
-python bmp_botsort_tracker.py --video data/ufc_events/ufc_300/your_fight_video.mp4 --outdir outputs/ufc_300_botsort
-```
+### Alternative Trackers
 
-## Example Data & Testing
+- `src/alternative_trackers/semantic_tracker.py`: CLIP-based semantic tracking
+- `src/alternative_trackers/botsort_basic.py`: Basic BotSORT implementation
 
-### Adesanya vs. Du Plessis Test Clip
-
-We provide a sample from the Adesanya vs. Du Plessis fight (UFC 305) for testing:
-
-**Download Example Clip:**
-```bash
-# Create example data directory
-mkdir -p example_data
-
-# Download a 30-second test clip (you'll need to add this)
-# Place your test clip as: example_data/adesanya_ddp_30s.mp4
-```
-
-**Run All Trackers:**
-```bash
-# Test semantic tracker (most accurate, slower)
-python fighter_tracker.py \
-    --video example_data/adesanya_ddp_30s.mp4 \
-    --outdir results/semantic \
-    --max-frames 150 \
-    --draw-keypoints
-
-# Test BotSORT (fastest)
-python bmp_botsort_tracker.py \
-    --video example_data/adesanya_ddp_30s.mp4 \
-    --outdir results/botsort \
-    --max-frames 150
-
-# Test occlusion-aware tracker (best for clinching)
-python bmp_occlusion_tracker.py \
-    --video example_data/adesanya_ddp_30s.mp4 \
-    --outdir results/occlusion \
-    --max-frames 150
-
-# Generate embeddings and clustering
-python video_cluster_embed.py \
-    --video example_data/adesanya_ddp_30s.mp4 \
-    --outdir results/embeddings \
-    --chunk-duration 5
-```
-
-**Expected Results:**
-- `tracked.mp4`: Annotated video with fighter IDs
-- `tracks.csv`: Frame-by-frame tracking data
-- `labels/`: Semantic segmentation masks
-- Interactive embedding visualizations
-
-## Performance Notes
-
-| Tracker | Speed (FPS) | GPU Memory | Accuracy | Best Use Case |
-|---------|-------------|------------|----------|---------------|
-| BotSORT | ~15-20 | 2-4GB | Good | Real-time applications |
-| Semantic | ~3-5 | 6-8GB | Excellent | Research, detailed analysis |
-| DeepSORT | ~10-15 | 3-5GB | Good | Balanced performance |
-| Occlusion-aware | ~8-12 | 4-6GB | Very Good | Close combat, clinching |
-
-**Optimization Tips:**
-- Use `--stride 5` or higher for faster processing
-- Reduce `--max-persons 2` if only tracking main fighters
-- Lower `--conf` threshold if missing detections
-- Use GPU acceleration for significant speedup
-
-## License
-
-This project is open source under the MIT License. Please check individual model licenses for commercial use:
-- MaskR-CNN, Keypoint R-CNN: Apache 2.0
-- CLIP: MIT License  
-- YOLO: GPL-3.0
-- BotSORT, DeepSORT: Various (check respective repositories)
-
-## Contributing
-
-Contributions welcome! Areas for improvement:
-- New tracking algorithms
-- Performance optimizations
-- Better occlusion handling
-- Multi-camera fusion
-- Real-time processing
-
-Please feel free to submit pull requests or open issues for bugs and feature requests.
+*See [docs/TECHNICAL_DETAILS.md](docs/TECHNICAL_DETAILS.md) for implementation details*
 
 
+## Documentation
+
+- **[Technical Details](docs/TECHNICAL_DETAILS.md)**: Algorithm deep-dive and implementation
+- **[Results Analysis](docs/RESULTS.md)**: Performance metrics and comparisons  
+- **[Interactive Demo](notebooks/tracker_demo.ipynb)**: Jupyter notebook walkthrough

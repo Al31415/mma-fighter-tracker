@@ -8,13 +8,6 @@
 
 Tracking fighters in MMA is challenging due to rapid motion, severe occlusions, and similar appearances. This system combines state-of-the-art detection, tracking, and re-identification to maintain consistent fighter identities throughout combat sequences.
 
-## What Problem Does This Solve?
-
-- **Automated Fight Analysis**: Generate highlight reels and fight statistics
-- **Broadcast Enhancement**: Real-time fighter identification for live events  
-- **Training Analysis**: Track fighter movement patterns and positioning
-- **Research Applications**: Large-scale analysis of combat sports data
-
 ## Demo Video
 
 See the tracker in action on a real UFC fight:

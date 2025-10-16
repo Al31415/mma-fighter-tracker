@@ -87,6 +87,7 @@ python src/tracker.py --video your_fight.mp4 --outdir results
 | `--max-frames` | 400 | Maximum frames to process (0 = all) |
 | `--stride` | 5 | Process every Nth frame for speed |
 | `--max-fighters` | 2 | Maximum fighters to track |
+| `--device` | auto | Device for inference (auto/cpu/cuda) |
 
 ### Advanced Configuration
 
@@ -97,7 +98,8 @@ python src/tracker.py \
     --conf 0.4 \
     --max-frames 1000 \
     --stride 3 \
-    --max-fighters 2
+    --max-fighters 2 \
+    --device cuda
 ```
 
 ### Output Format

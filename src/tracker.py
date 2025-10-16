@@ -164,10 +164,16 @@ def crop_from_box(frame_bgr: np.ndarray, box_xyxy: np.ndarray, pad: float = 0.1)
 	return frame_bgr[y1p:y2p, x1p:x2p]
 
 
-def run(video: str, outdir: str, stride: int, conf: float, iou: float, max_frames: int, max_persons: int, min_mask_area_frac: float, center_bias: float, reid_model: str, use_reid_features: bool) -> None:
+def run(video: str, outdir: str, stride: int, conf: float, iou: float, max_frames: int, max_persons: int, min_mask_area_frac: float, center_bias: float, reid_model: str, use_reid_features: bool, device: str) -> None:
 	
 	os.makedirs(outdir, exist_ok=True)
-	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+	
+	# Handle device selection
+	if device == "auto":
+		device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+	else:
+		device = torch.device(device)
+	
 	print(f"Device: {device}")
 	
 	fps, n_frames, w, h = _read_video_meta(video)
@@ -187,7 +193,7 @@ def run(video: str, outdir: str, stride: int, conf: float, iou: float, max_frame
 		tracker_type="botsort",
 		tracker_config=tracker_cfg,
 		reid_weights=reid_w,
-		device="0" if torch.cuda.is_available() else "cpu",
+		device=str(device),
 		half=False
 	)
 	
@@ -272,7 +278,8 @@ def run(video: str, outdir: str, stride: int, conf: float, iou: float, max_frame
 			continue
 
 		# YOLO detection
-		res = seg_model.predict(source=frame, conf=float(conf), iou=float(iou), verbose=False, device=0 if torch.cuda.is_available() else None)
+		yolo_device = 0 if device.type == "cuda" else None
+		res = seg_model.predict(source=frame, conf=float(conf), iou=float(iou), verbose=False, device=yolo_device)
 		result = res[0]
 		
 		# Select persons
@@ -394,6 +401,7 @@ def parse_args() -> argparse.Namespace:
 	p.add_argument("--center-bias", type=float, default=0.15, help="Low for edge fighters")
 	p.add_argument("--reid-model", type=str, default="osnet_x1_0")
 	p.add_argument("--no-vips-reid", action="store_true", help="Disable VIPS ReID (use BotSORT default)")
+	p.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "cuda", "cuda:0", "cuda:1"], help="Device to use for inference (default: auto)")
 	return p.parse_args()
 
 
@@ -411,5 +419,6 @@ if __name__ == "__main__":
 		center_bias=args.center_bias,
 		reid_model=args.reid_model,
 		use_reid_features=(not args.no_vips_reid),
+		device=args.device,
 	)
 

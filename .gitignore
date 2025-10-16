@@ -1,6 +1,7 @@
 # Results and outputs
 results*/
 outputs/
+demo_results/
 *.mp4
 *.avi
 !example_data/*.mp4

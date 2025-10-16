@@ -189,11 +189,13 @@ def run(video: str, outdir: str, stride: int, conf: float, iou: float, max_frame
 	tracker_cfg = _find_botsort_cfg()
 	reid_w = Path("osnet_x0_25_msmt17.pt")
 	print(f"Loading BotSORT tracker...")
+	# Convert device to BotSORT format
+	botsort_device = "0" if device.type == "cuda" else "cpu"
 	tracker = create_tracker(
 		tracker_type="botsort",
 		tracker_config=tracker_cfg,
 		reid_weights=reid_w,
-		device=str(device),
+		device=botsort_device,
 		half=False
 	)
 	

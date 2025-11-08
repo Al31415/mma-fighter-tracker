@@ -1,9 +1,5 @@
 # MMA Fighter Tracker
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![OpenCV](https://img.shields.io/badge/OpenCV-4.5+-green.svg)](https://opencv.org/)
-
 **Robust multi-object tracking for MMA/UFC videos using YOLO + BotSORT + VIPS ReID**
 
 Tracking fighters in MMA is challenging due to rapid motion, severe occlusions, and similar appearances. This system combines state-of-the-art detection, tracking, and re-identification to maintain consistent fighter identities throughout combat sequences.

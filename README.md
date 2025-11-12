@@ -8,7 +8,7 @@ Tracking fighters in MMA is challenging due to rapid motion, severe occlusions, 
 
 See the tracker in action on a real UFC fight:
 
-[![MMA Fighter Tracker Demo](https://img.youtube.com/vi/ioP4ylr0Ggk/0.jpg)](https://www.youtube.com/watch?v=ioP4ylr0Ggk)
+[![MMA Fighter Tracker Demo]([https://img.youtube.com/vi/ioP4ylr0Ggk/0.jpg)](https://www.youtube.com/watch?v=ioP4ylr0Ggk](https://youtu.be/TuAXbriYNxg))
 
 *Click to watch: Real-time fighter tracking with robust occlusion handling*
 
